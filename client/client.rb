@@ -1,3 +1,3 @@
-require './assets/constants'
-require './engine/runner'
-BotEngine.new
+require_relative 'modules/bot_engine'
+
+BotEngine.new.execute

@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     base64 (0.2.0)
+    bigdecimal (3.1.5)
     concurrent-ruby (1.2.2)
     dry-core (1.0.1)
       concurrent-ruby (~> 1.0)
@@ -16,13 +17,14 @@ GEM
       dry-types (>= 1.7, < 2)
       ice_nine (~> 0.11)
       zeitwerk (~> 2.6)
-    dry-types (1.7.1)
+    dry-types (1.7.2)
+      bigdecimal (~> 3.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.0)
       dry-inflector (~> 1.0)
       dry-logic (~> 1.4)
       zeitwerk (~> 2.6)
-    faraday (2.7.12)
+    faraday (2.8.1)
       base64
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
@@ -34,7 +36,7 @@ GEM
     multipart-post (2.3.0)
     net-http-persistent (2.9.4)
     ruby2_keywords (0.0.5)
-    sqlite3 (1.6.9-x86_64-linux)
+    sqlite3 (1.7.0-x86_64-linux)
     telegram-bot-ruby (1.0.0)
       dry-struct (~> 1.6)
       faraday (~> 2.0)
@@ -49,7 +51,7 @@ DEPENDENCIES
   json
   net-http-persistent (~> 2.9)
   sqlite3
-  telegram-bot-ruby
+  telegram-bot-ruby (= 1.0.0)
 
 BUNDLED WITH
    2.4.9
