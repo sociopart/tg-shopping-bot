@@ -20,7 +20,7 @@ class BotEngine
           bot.listen do |rqst|
             Thread.start(rqst) do |current_rqst|
               begin
-                if Listener.message_is_new(start_bot_time, current_rqst)
+                if Listener.message_is_new(start_bot_time, current_rqst) 
                   Listener.process_message(bot, current_rqst)
                 end
               rescue => error

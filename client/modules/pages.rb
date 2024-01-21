@@ -1,4 +1,24 @@
 require_relative 'constants'
+require_relative 'controller'
+
+
+def menu_handler(bot, message, current_page = nil)
+  
+  case current_page
+  when "catalogue"
+  when "search"
+  when "orders"
+    menu_orders(bot, message)
+  when "cart"
+  when "main"
+    menu_main(bot, message)
+  else
+    # main page
+    menu_main(bot, message)
+  end
+end
+
+
 
 PAGES = [
   # Начальная команда /start
@@ -8,37 +28,40 @@ PAGES = [
     action: lambda { |bot, message|
       # Если пользователь НЕ подписан на канал
       if !BotEngine::Listener::user_subscribed?(bot, "-1001707061142", message.from.id)
-        text = "Здравствуйте, #{message.from.first_name}!\n" \
-              "Для корректной работы бота, подпишитесь на канал магазина " \
-              "по кнопке ниже.\n" \
-              "После подписки, нажмите <b>«Я подписался»</b>."
-        kb = [
-          [Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Перейти на канал', url: BotEngine::Constants::CHANNEL_URL)],
-          [Telegram::Bot::Types::InlineKeyboardButton.new(text: '✅ Я подписался', callback_data: 'check_subscription')]
-        ]
-        markup = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: kb)
-        bot.api.send_message(chat_id: message.chat.id, text: text, reply_markup: markup, parse_mode: "html")
+        menu_non_subscribed(bot, message)
       # Если подписан
       else
-        bot.api.send_message(chat_id: message.from.id, text: "пук")
+        menu_handler(bot, message)
       end
+    }
+  },
+  {
+    type: Telegram::Bot::Types::CallbackQuery,
+    command_id: "main_orders",
+    action: lambda { |bot, message| 
+      menu_handler(bot, message, "orders")
+    }
+  },
+  {
+    type: Telegram::Bot::Types::CallbackQuery,
+    command_id: "main_menu",
+    action: lambda { |bot, message| 
+      menu_handler(bot, message, "main")
     }
   },
   {
     type: Telegram::Bot::Types::CallbackQuery,
     command_id: "check_subscription",
     action: lambda { |bot, message| 
-      if message.data == 'check_subscription'
-        puts message.from.id.to_s
-        subscription_status = bot.api.get_chat_member({
-          "chat_id": "-1001707061142",
-          "user_id": message.from.id.to_i
-        })
-        if subscription_status["status"] != "left"
-          bot.api.send_message(chat_id: message.from.id, text: "touch me!")
-        else
-          bot.api.send_message(chat_id: message.from.id, text: "Don't touch me!")
-        end
+      puts message.from.id.to_s
+      subscription_status = bot.api.get_chat_member({
+        "chat_id": "-1001707061142",
+        "user_id": message.from.id.to_i
+      })
+      if subscription_status["status"] != "left"
+        # Снова вызываем стартовую
+        result_page = PAGES.find { |page| page[:command_id] == "/start"}
+        result_page[:action].call(bot, message) if !result_page.nil?
       end
     }
   }
