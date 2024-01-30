@@ -3,4 +3,6 @@ source 'https://rubygems.org'
 gem 'json'
 gem 'net-http-persistent', '~> 2.9'
 gem 'sqlite3'
+gem 'google_drive' # parse google spreadsheets
 gem 'telegram-bot-ruby', '= 1.0.0'
+

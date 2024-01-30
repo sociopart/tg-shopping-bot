@@ -1,3 +1,4 @@
-require_relative 'modules/bot_engine'
+require_relative 'engine'
+require_relative 'modules/routes'
 
-BotEngine.new.execute
+BotEngine.new(ENV.fetch('CLIENT_BOT_API_KEY'), nil, ROUTES).execute

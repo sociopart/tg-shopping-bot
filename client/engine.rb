@@ -1,14 +1,18 @@
 require 'telegram/bot'
-require_relative 'constants'
-require_relative 'pages'
+require 'uri'
+
+
+TG_MESSAGE = Telegram::Bot::Types::Message
+TG_CALLBACK = Telegram::Bot::Types::CallbackQuery
 
 class BotEngine
-  def initialize
-    @bot_handle = Telegram::Bot::Client.new(Constants::API_TOKEN)
+  def initialize(api_token, bot_config, routes)
+    @bot_handle = Telegram::Bot::Client.new(api_token)
 
-    @bot_handle.api.delete_my_commands
-    @bot_handle.api.set_my_commands(Constants::COMMANDS)
-    
+    #@bot_handle.api.delete_my_commands
+    #@bot_handle.api.set_my_commands(Constants::COMMANDS)
+    @bot_config = bot_config
+    @routes = routes
     # TODO: name, description, short description ....
   end
 
@@ -24,8 +28,7 @@ class BotEngine
     message_delay > (5 * 60)
   end
 
-
-  def user_subscribed?(bot, chat_id, user_id)
+  def self.user_subscribed?(bot, chat_id, user_id)
     subscription_status = bot.api.get_chat_member({
         "chat_id": chat_id,
         "user_id": user_id
@@ -43,9 +46,14 @@ class BotEngine
       else
         nil
       end
-    result_page = PAGES.find { |page| page[:type] == message.class && \
-                                      page[:command_id] == message_info}
-    result_page[:action].call(bot, message) if !result_page.nil?
+    
+    uri = URI.parse(message_info)&.query&.split('&')&.map{ |q| q.split('=') }
+    params = uri.nil? ? {} : Hash[uri]
+
+    puts "params is: #{params}"
+    result_page = @routes.find { |route| route[:type] == message.class && \
+                                         route[:id] == message_info}
+    result_page[:handler].call(bot, message, params) if !result_page.nil?
   end
 
   def execute
